@@ -1,0 +1,37 @@
+name: 24x7 PayUp Video Bot
+
+on:
+  schedule:
+    # Runs automatically every 5 hours to keep the bot cycling continuously
+    - cron: '0 */5 * * *'
+  workflow_dispatch: # Allows you to manually trigger the workflow from the Actions tab
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300 # Sets a maximum limit of 5 hours per run session
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Run PayUp Automation Script
+        run: |
+          echo "Starting PayUp Bot execution..."
+          python bot.py
+          echo "PayUp Bot session completed."
